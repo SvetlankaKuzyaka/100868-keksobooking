@@ -279,6 +279,25 @@ body {
   margin-right: -10px;
 }
 
+.hotels-list-loading,
+.hotels-list-failure {
+  text-align: center;
+  padding-bottom: 40px;
+}
+
+.hotels-list-loading:after,
+.hotels-list-failure:after {
+  font-size: 20px;
+}
+
+.hotels-list-loading:after {
+  content: 'Загрузка...';
+}
+
+.hotels-list-failure:after {
+  content: 'Ошибка загрузки';
+}
+
 /* Singular result */
 .hotel {
   background-color: #e8e5dc;

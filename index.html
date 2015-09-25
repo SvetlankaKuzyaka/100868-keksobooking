@@ -58,12 +58,9 @@
   </div>
 
   <form class="hotels-filters">
-    <div role="button" class="hotel-filter hotel-filter-dropdown">Сначала дорогие</div>
-    <div role="button" class="hotel-filter hotel-filter-dropdown">От 2 звезд</div>
-    <div role="button" class="hotel-filter hotel-filter-dropdown">Рейтинг не ниже 6</div>
-    <div role="button" class="hotel-filter hotel-filter-dropdown">До центра не более 1 км</div>
-    <div role="button" class="hotel-filter">Только избранные</div>
-    <div role="button" class="hotel-filter-reset">Сбросить фильтры</div>
+    <div role="button" id="sort-hotels-default" class="hotel-filter hotel-filter-dropdown hotel-filter-selected">Все</div>
+    <div role="button" id="sort-by-price-asc" class="hotel-filter hotel-filter-dropdown">Сначала дешевые</div>
+    <div role="button" id="sort-by-price-desc" class="hotel-filter hotel-filter-dropdown">Сначала дорогие</div>
   </form>
 
   <div class="hotels-list"></div>
@@ -89,6 +86,7 @@
 
 <script src="js/cookies.js"></script>
 <script src="js/form-validate.js"></script>
+<script src="data/hotels.js" charset="utf-8"></script>
 <script src="js/hotels.js" charset="utf-8"></script>
 
 </body>
