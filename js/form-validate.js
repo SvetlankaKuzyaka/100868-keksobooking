@@ -1,13 +1,15 @@
+'use strict';
+
 (function() {
-  var addLeadingZero = function(value) {
+  function addLeadingZero(value) {
     if (value < 10) {
       return '0' + value;
     }
 
     return '' + value;
-  };
+  }
 
-  var getFormattedDate = function(date) {
+  function getFormattedDate(date) {
     if (typeof date === 'undefined') {
       date = new Date();
     }
@@ -16,9 +18,9 @@
     var fullDate = addLeadingZero(date.getDate());
 
     return [date.getFullYear(), fullMonth, fullDate].join('-');
-  };
+  }
 
-  var restoreFormValueFromCookies = function(form) {
+  function restoreFormValueFromCookies(form) {
     var element;
     for (var i = 0, l = form.elements.length; i < l; i++) {
       element = form.elements[i];
@@ -26,8 +28,8 @@
       if (docCookies.hasItem(element.name)) {
         element.value = docCookies.getItem(element.name);
       }
-    };
-  };
+    }
+  }
 
   var formElement = document.forms['searchform'];
 
@@ -36,7 +38,6 @@
   var guestsNumber = formElement['searchform-guests-number'];
   var roomsNumber = formElement['searchform-guests-rooms'];
 
-  var MAX_GUESTS_AVAILABLE = 6;
   var MAX_GUESTS_PER_ROOM = 3;
   var MIN_GUESTS_PER_ROOM = 1;
   var MILLISECONDS_IN_DAY = 60 * 60 * 24 * 1000;
@@ -53,7 +54,7 @@
 
   restoreFormValueFromCookies(formElement);
 
-  dateFrom.onchange = function(evt) {
+  dateFrom.onchange = function() {
     var dateFromValue = new Date(dateFrom.value);
     var dateToValue = new Date(dateTo.value);
     var minimalToDate = getFormattedDate(new Date(+dateFromValue + minimalDifference));
@@ -65,12 +66,12 @@
     dateTo.min = minimalToDate;
   };
 
-  guestsNumber.onchange = function(evt) {
-    roomsNumber.min = parseInt(parseInt(guestsNumber.value, 10) / MAX_GUESTS_PER_ROOM);
-    roomsNumber.max = parseInt(parseInt(guestsNumber.value, 10) / MIN_GUESTS_PER_ROOM);
+  guestsNumber.onchange = function() {
+    roomsNumber.min = parseInt(parseInt(guestsNumber.value, 10) / MAX_GUESTS_PER_ROOM, 10);
+    roomsNumber.max = parseInt(parseInt(guestsNumber.value, 10) / MIN_GUESTS_PER_ROOM, 10);
   };
 
-  roomsNumber.onchange = function(evt) {
+  roomsNumber.onchange = function() {
     guestsNumber.min = parseInt(roomsNumber.value, 10) * MIN_GUESTS_PER_ROOM;
     guestsNumber.max = parseInt(roomsNumber.value, 10) * MAX_GUESTS_PER_ROOM;
   };
