@@ -240,6 +240,16 @@ body {
   padding: 0 10px;
 }
 
+.hotel-filter:hover {
+  border-color: #c3c3bc;
+}
+
+.hotel-filter-selected,
+.hotel-filter-selected:hover {
+  border-color: #333;
+}
+
+
 .hotel-filter-reset {
   font-size: 14px;
   cursor: pointer;
