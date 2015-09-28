@@ -9,6 +9,10 @@ body {
   min-width: 980px;
 }
 
+.hidden {
+  display: none;
+}
+
 /* Common styles. */
 .center-wrapper {
   box-sizing: border-box;
@@ -307,6 +311,7 @@ body {
   border-radius: 4px;
   box-sizing: border-box;
   color: #fff;
+  cursor: pointer;
   display: inline-block;
   font-size: 14px;
   height: 230px;
@@ -321,6 +326,7 @@ body {
 
 .hotel-nophoto {
   background-image: none;
+  cursor: default;
 }
 
 .hotel-nophoto::before {
@@ -497,4 +503,58 @@ body {
   position: absolute;
   right: 9px;
   text-decoration: none;
+}
+
+.gallery-overlay {
+  background: rgba(0, 0, 0, 0.8);
+  bottom: 0;
+  left: 0;
+  overflow: auto;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 1;
+}
+
+.gallery-overlay-close {
+  color: #fff;
+  cursor: pointer;
+  font-size: 40px;
+  position: absolute;
+  right: 1ex;
+  text-align: center;
+  top: 0.5ex;
+}
+
+.gallery-overlay-preview {
+  height: 600px;
+  vertical-align: middle;
+  width: 100%;
+}
+
+.gallery-overlay-controls {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.gallery-overlay-control {
+  background: url('../img/control-sprite.png') no-repeat;
+  cursor: pointer;
+  display: inline-block;
+  height: 40px;
+  opacity: 0.3;
+  vertical-align: middle;
+  width: 40px;
+}
+
+.gallery-overlay-control:hover {
+  opacity: 1;
+}
+
+.gallery-overlay-control:active {
+  transform: translate(0, 1px);
+}
+
+.gallery-overlay-control-right {
+  background-position: -40px 0;
 }
