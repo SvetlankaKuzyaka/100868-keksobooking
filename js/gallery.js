@@ -16,26 +16,21 @@
       if (element.classList.contains(className)) {
         return !element.classList.contains('hotel-nophoto');
       }
-    } while ((element = element.parentElement));
+      element = element.parentElement;
+    } while (element);
 
     return false;
   }
 
   function hideGallery() {
     galleryElement.classList.add('hidden');
-    closeButton.removeEventListener('click');
-    // Make a statement about keyHandler and why is it possible
-    // to use it even before it was defined.
+    closeButton.removeEventListener('click', closeHandler);
     document.body.removeEventListener('keydown', keyHandler);
   }
 
-  function showGallery() {
-    galleryElement.classList.remove('hidden');
-    closeButton.addEventListener('click', function(evt) {
-      evt.preventDefault();
-      hideGallery();
-    });
-    document.body.addEventListener('keydown', keyHandler);
+  function closeHandler(evt) {
+    evt.preventDefault();
+    hideGallery();
   }
 
   function keyHandler(evt) {
@@ -47,10 +42,16 @@
         console.log('show next photo');
         break;
       case Key.ESC:
-      default:
         hideGallery();
         break;
+      default: break;
     }
+  }
+
+  function showGallery() {
+    galleryElement.classList.remove('hidden');
+    closeButton.addEventListener('click', closeHandler);
+    document.body.addEventListener('keydown', keyHandler);
   }
 
   hotelsContainer.addEventListener('click', function(evt) {

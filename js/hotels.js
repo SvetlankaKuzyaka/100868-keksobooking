@@ -38,9 +38,9 @@
   var hotelsContainer = document.querySelector('.hotels-list');
   var hotels;
   var currentHotels;
-  var currentPage;
+  var currentPage = 0;
 
-  function renderHotels(filteredHotels, pageNumber, replace) {
+  function renderHotels(hotelsToRender, pageNumber, replace) {
     replace = typeof replace !== 'undefined' ? replace : true;
     pageNumber = pageNumber || 0;
 
@@ -54,7 +54,7 @@
 
     var hotelsFrom = pageNumber * PAGE_SIZE;
     var hotelsTo = hotelsFrom + PAGE_SIZE;
-    var hotelsToRender = filteredHotels.slice(hotelsFrom, hotelsTo);
+    hotelsToRender = hotelsToRender.slice(hotelsFrom, hotelsTo);
 
     hotelsToRender.forEach(function(hotel) {
       var newHotelElement = hotelTemplate.content.children[0].cloneNode(true);
@@ -121,13 +121,13 @@
 
         case ReadyState.DONE:
         default:
-          if (loadedXhr.status === 200) {
+          if (xhr.status === 200) {
             var data = loadedXhr.response;
             hotelsContainer.classList.remove('hotels-list-loading');
             callback(JSON.parse(data));
           }
 
-          if (loadedXhr.status > 400) {
+          if (xhr.status > 400) {
             showLoadFailure();
           }
           break;
@@ -181,13 +181,8 @@
         break;
     }
 
+    localStorage.setItem('filterID', filterID);
     return filteredHotels;
-  }
-
-  function setActiveFilter(filterID) {
-    currentHotels = filterHotels(hotels, filterID);
-    currentPage = 0;
-    renderHotels(currentHotels, currentPage, true);
   }
 
   function initFilters() {
@@ -200,6 +195,12 @@
       document.querySelector('.hotel-filter-selected').classList.remove('hotel-filter-selected');
       clickedFilter.classList.add('hotel-filter-selected');
     });
+  }
+
+  function setActiveFilter(filterID) {
+    currentHotels = filterHotels(hotels, filterID);
+    currentPage = 0;
+    renderHotels(currentHotels, currentPage, true);
   }
 
   function isNextPageAvailable() {
@@ -234,6 +235,6 @@
 
   loadHotels(function(loadedHotels) {
     hotels = loadedHotels;
-    setActiveFilter('sort-hotels-default');
+    setActiveFilter(localStorage.getItem('filterID') || 'sort-hotels-default');
   });
 })();
