@@ -16,6 +16,23 @@
   };
 
   /**
+   * Проверяет есть ли у переданного элемента или одного из его родителей
+   * переданный CSS-класс.
+   * @param {Element} element
+   * @param {string} className
+   */
+  function doesHaveParent(element, className) {
+    do {
+      if (element.classList.contains(className)) {
+        return !element.classList.contains('hotel-nophoto');
+      }
+      element = element.parentElement;
+    } while (element);
+
+    return false;
+  }
+
+  /**
    * @const
    * @type {number}
    */
@@ -223,7 +240,7 @@
     filtersContainer.addEventListener('click', function(evt) {
       var clickedFilter = evt.target;
 
-      if (clickedFilter.classList.contains('filter-element')) {
+      if (doesHaveParent(clickedFilter, 'hotel-filter')) {
         setActiveFilter(clickedFilter.id);
       }
     });
