@@ -1,6 +1,12 @@
+/* global Hotel: true Gallery: true */
+
 'use strict';
 
 (function() {
+  /**
+   * Константы, описывающие состояние ReadyState.
+   * @enum {number}
+   */
   var ReadyState = {
     'UNSENT': 0,
     'OPENED': 1,
@@ -9,100 +15,111 @@
     'DONE': 4
   };
 
-  var amenityClassName = {
-    'breakfast': 'hotel-amenity-breakfast',
-    'parking': 'hotel-amenity-parking',
-    'wifi': 'hotel-amenity-wifi'
-  };
-
-  var starsClassName = {
-    '1': 'hotel-stars',
-    '2': 'hotel-stars-two',
-    '3': 'hotel-stars-three',
-    '4': 'hotel-stars-four',
-    '5': 'hotel-stars-five'
-  };
-
-  var ratingClassName = {
-    '4': 'hotel-rating-four',
-    '5': 'hotel-rating-five',
-    '6': 'hotel-rating-six',
-    '7': 'hotel-rating-seven',
-    '8': 'hotel-rating-eight',
-    '9': 'hotel-rating-nine'
-  };
-
+  /**
+   * @const
+   * @type {number}
+   */
   var REQUEST_FAILURE_TIMEOUT = 10000;
+
+  /**
+   * @const
+   * @type {number}
+   */
   var PAGE_SIZE = 9;
 
+  /**
+   * Контейнер списка отелей.
+   * @type {Element}
+   */
   var hotelsContainer = document.querySelector('.hotels-list');
+
+  /**
+   * Объект типа фотогалерея.
+   * @type {Gallery}
+   */
+  var gallery = new Gallery();
+
+  /**
+   * Исходный список загруженных с сервера данных для отелей.
+   * @type {Array.<Object>}
+   */
   var hotels;
+
+  /**
+   * Текущий отрисованный на странице список отелей. Отличается
+   * от hotels тем, что может быть в данный момент отфильтрован.
+   * @type {Array.<Object>}
+   */
   var currentHotels;
+
+  /**
+   * Номер текущей страницы.
+   * @type {number}
+   */
   var currentPage = 0;
 
+  /**
+   * Список отрисованных отелей. Используется для обращения к каждому
+   * из отелей для удаления его со страницы.
+   * @type {Array.<Hotel>}
+   */
+  var renderedHotels = [];
+
+  /**
+   * Выводит на страницу список отелей постранично.
+   * @param {Array.<Object>} hotelsToRender
+   * @param {number} pageNumber
+   * @param {boolean=} replace
+   */
   function renderHotels(hotelsToRender, pageNumber, replace) {
     replace = typeof replace !== 'undefined' ? replace : true;
     pageNumber = pageNumber || 0;
 
+    // Удаление списка отелей. Пока в массиве renderedHotels есть объекты
+    // Hotel, вызывается функция Array.prototype.shift(), которая удаляет
+    // первый элемент из массива и возвращает его, и у этого отеля вызывается
+    // метод Hotel.prototype.unrender.
     if (replace) {
+      var el;
+      while ((el = renderedHotels.shift())) {
+        el.unrender();
+      }
+
       hotelsContainer.classList.remove('hotels-list-failure');
-      hotelsContainer.innerHTML = '';
     }
 
-    var hotelTemplate = document.getElementById('hotel-template');
     var hotelsFragment = document.createDocumentFragment();
 
     var hotelsFrom = pageNumber * PAGE_SIZE;
     var hotelsTo = hotelsFrom + PAGE_SIZE;
     hotelsToRender = hotelsToRender.slice(hotelsFrom, hotelsTo);
 
-    hotelsToRender.forEach(function(hotel) {
-      var newHotelElement = hotelTemplate.content.children[0].cloneNode(true);
-      var amenitiesContainer = newHotelElement.querySelector('.hotel-amenities');
-
-      newHotelElement.querySelector('.hotel-stars').classList.add(starsClassName[hotel['stars']]);
-      newHotelElement.querySelector('.hotel-name').textContent = hotel['name'];
-      newHotelElement.querySelector('.hotel-distance-kilometers').textContent = [hotel['distance'], 'км'].join(' ');
-      newHotelElement.querySelector('.hotel-price-value').textContent = hotel['price'];
-      newHotelElement.querySelector('.hotel-rating').textContent = hotel['rating'];
-      newHotelElement.querySelector('.hotel-rating').classList.add(ratingClassName[Math.floor(hotel['rating'])]);
-
-      hotel['amenities'].forEach(function(amenity) {
-        var amenityElement = document.createElement('li');
-        amenityElement.classList.add('hotel-amenity');
-        amenityElement.classList.add(amenityClassName[amenity]);
-        amenitiesContainer.appendChild(amenityElement);
-      });
-
-      hotelsFragment.appendChild(newHotelElement);
-
-      if (hotel['preview']) {
-        var hotelBackground = new Image();
-        hotelBackground.src = hotel['preview'];
-
-        var imageLoadTimeout = setTimeout(function() {
-          newHotelElement.classList.add('hotel-nophoto');
-        }, REQUEST_FAILURE_TIMEOUT);
-
-        hotelBackground.onload = function() {
-          newHotelElement.style.backgroundImage = 'url(\'' + hotelBackground.src + '\')';
-          newHotelElement.style.backgroundSize = '100% auto';
-          clearTimeout(imageLoadTimeout);
-        };
-
-        hotelBackground.onerror = function() {
-          newHotelElement.classList.add('hotel-nophoto');
-        };
-      }
+    // Отрисовка списка отелей. На каждой итерации цикла создается объект
+    // типа Hotel с уникальными данными, отрисовывается в предназначенный
+    // для него контейнер (hotelsFragment) и добавляется в массив renderedHotels.
+    hotelsToRender.forEach(function(hotelData) {
+      var newHotelElement = new Hotel(hotelData);
+      newHotelElement.render(hotelsFragment);
+      renderedHotels.push(newHotelElement);
     });
 
     hotelsContainer.appendChild(hotelsFragment);
   }
 
+  /**
+   * Добавляет класс ошибки контейнеру с отелями. Используется в случае
+   * если произошла ошибка загрузки отелей или загрузка прервалась
+   * по таймауту.
+   */
   function showLoadFailure() {
     hotelsContainer.classList.add('hotels-list-failure');
   }
 
+  /**
+   * Загрузка списка отелей. После успешной загрузки вызывается функция
+   * callback, которая передается в качестве аргумента.
+   * @param {function} callback
+   */
   function loadHotels(callback) {
     var xhr = new XMLHttpRequest();
     xhr.timeout = REQUEST_FAILURE_TIMEOUT;
@@ -139,9 +156,23 @@
     };
   }
 
+  /**
+   * Фильтрация списка отелей. Принимает на вход список отелей
+   * и ID фильтра. В зависимости от переданного ID применяет
+   * разные алгоритмы фильтрации. Возвращает отфильтрованный
+   * список и записывает примененный фильтр в localStorage.
+   * Не изменяет исходный массив.
+   * @param {Array.<Object>} hotelsToFilter
+   * @param {string} filterID
+   * @return {Array.<Object>}
+   */
   function filterHotels(hotelsToFilter, filterID) {
     var filteredHotels = hotelsToFilter.slice(0);
     switch (filterID) {
+      // При сортировке по возрастанию цены используется необычный алгоритм.
+      // Он отправляет все отели, у которых цена равна нулю в конец списка,
+      // оставляя при этом остальной список отсортированным от меньшей цены
+      // к большей.
       case 'sort-by-price-asc':
         filteredHotels = filteredHotels.sort(function(a, b) {
           if (a.price > b.price || (b.price && a.price === 0)) {
@@ -156,7 +187,6 @@
             return 0;
           }
         });
-
         break;
 
       case 'sort-by-price-desc':
@@ -173,11 +203,6 @@
             return 0;
           }
         });
-
-        break;
-
-      default:
-        filteredHotels = hotelsToFilter.slice(0);
         break;
     }
 
@@ -185,39 +210,71 @@
     return filteredHotels;
   }
 
+  /**
+   * Инициализация подписки на клики по кнопкам фильтра.
+   * Используется делегирование событий: события обрабатываются на объекте,
+   * содержащем все фильтры, и в момент наступления события, проверяется,
+   * произошел ли клик по фильтру или нет и если да, то вызывается функция
+   * установки фильтра.
+   */
   function initFilters() {
     var filtersContainer = document.querySelector('.hotels-filters');
 
     filtersContainer.addEventListener('click', function(evt) {
       var clickedFilter = evt.target;
-      setActiveFilter(clickedFilter.id);
 
-      document.querySelector('.hotel-filter-selected').classList.remove('hotel-filter-selected');
-      clickedFilter.classList.add('hotel-filter-selected');
+      if (clickedFilter.classList.contains('filter-element')) {
+        setActiveFilter(clickedFilter.id);
+      }
     });
   }
 
+  /**
+   * Вызывает функцию фильтрации на списке отелей с переданным fitlerID
+   * и подсвечивает кнопку активного фильтра.
+   * @param {string} filterID
+   */
   function setActiveFilter(filterID) {
     currentHotels = filterHotels(hotels, filterID);
     currentPage = 0;
     renderHotels(currentHotels, currentPage, true);
+
+    document.querySelector('.hotel-filter-selected').classList.remove('hotel-filter-selected');
+    document.querySelector('#' + filterID).classList.add('hotel-filter-selected');
   }
 
+  /**
+   * Проверяет можно ли отрисовать следующую страницу списка отелей.
+   * @return {boolean}
+   */
   function isNextPageAvailable() {
     return currentPage < Math.ceil(hotels.length / PAGE_SIZE);
   }
 
+  /**
+   * Проверяет, находится ли скролл внизу страницы.
+   * @return {boolean}
+   */
   function isAtTheBottom() {
     var GAP = 100;
     return hotelsContainer.getBoundingClientRect().bottom - GAP <= window.innerHeight;
   }
 
+  /**
+   * Испускает на объекте window событие loadneeded если скролл находится внизу
+   * страницы и существует возможность показать еще одну страницу.
+   */
   function checkNextPage() {
     if (isAtTheBottom() && isNextPageAvailable()) {
       window.dispatchEvent(new CustomEvent('loadneeded'));
     }
   }
 
+  /**
+   * Создает два обработчика событий: на прокручивание окна, который в оптимизированном
+   * режиме (раз в 100 миллисекунд скролла) проверяет можно ли отрисовать следующую страницу;
+   * и обработчик события loadneeded, который вызывает функцию отрисовки следующей страницы.
+   */
   function initScroll() {
     var someTimeout;
     window.addEventListener('scroll', function() {
@@ -230,9 +287,28 @@
     });
   }
 
+  /**
+   * Добавляет обработчик события showgallery, которое испускается объектом window
+   * в объекте типа Hotel, если произошел клик по фотографии отеля. При наступлении
+   * этого события, показывает фотогалерею и загружает в нее фотографии отеля,
+   * полученные через метод getPhotos() у отеля, переданного через объект
+   * CustomEvent.prototype.detail.
+   */
+  function initGallery() {
+    window.addEventListener('showgallery', function(evt) {
+      gallery.setPhotos(evt.detail.hotelElement.getPhotos());
+      gallery.show();
+    });
+  }
+
   initFilters();
   initScroll();
+  initGallery();
 
+  // Загружает список отелей из файла data/hotels.json и отрисовывает его
+  // на странице после вызова фильтрации с ID сохраненным в localStorage.
+  // Если в localStorage не сохранен ID фильтра, используется значение
+  // по умолчанию.
   loadHotels(function(loadedHotels) {
     hotels = loadedHotels;
     setActiveFilter(localStorage.getItem('filterID') || 'sort-hotels-default');
