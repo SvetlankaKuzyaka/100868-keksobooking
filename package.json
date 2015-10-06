@@ -1,17 +1,12 @@
 {
-  "name": "{{userId}}-{{projectName}}",
+  "name": "asd",
   "version": "0.1.0",
   "private": true,
-  "description": "Обучающий проект «{{projectName}}» от HTML Academy",
-  "author": "{{userName}}",
+  "description": "asd",
+  "author": "asd",
   "repository": {
-    "type": "git",
-    "url": "{{gitUrl}}"
+    "type": "git"
   },
-  "bugs": {
-    "url": "{{bugsUrl}}"
-  },
-  "homepage": "{{homepage}}",
   "devDependencies": {
     "eslint": "1.5.1"
   },
