@@ -20,6 +20,7 @@
    * переданный CSS-класс.
    * @param {Element} element
    * @param {string} className
+   * @return {boolean}
    */
   function doesHaveParent(element, className) {
     do {
