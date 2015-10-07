@@ -48,7 +48,7 @@
   guestsNumber.min = roomsNumber.min = 1;
 
   dateFrom.value = getFormattedDate();
-  dateTo.value = getFormattedDate(new Date(new Date(dateFrom.value) + minimalDifference));
+  dateTo.value = getFormattedDate(new Date(new Date(dateFrom.value).getTime() + minimalDifference));
   guestsNumber.value = 2;
   roomsNumber.value = 1;
 
