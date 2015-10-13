@@ -4,25 +4,6 @@
 
 (function() {
   /**
-   * Проверяет есть ли у переданного элемента или одного из его родителей
-   * переданный CSS-класс.
-   * @param {Element} element
-   * @param {string} className
-   * @return {boolean}
-   */
-  function doesHaveParent(element, className) {
-    do {
-      if (element.classList.contains(className)) {
-        return true;
-      }
-
-      element = element.parentElement;
-    } while (element);
-
-    return false;
-  }
-
-  /**
    * @const
    * @type {number}
    */
@@ -57,6 +38,11 @@
   var hotelsCollection = new HotelsCollection();
 
   /**
+   * @type {Array.<Object>}
+   */
+  var initiallyLoaded = [];
+
+  /**
    * @type {Array.<HotelView>}
    */
   var renderedViews = [];
@@ -79,14 +65,27 @@
         // подчистить память после удаления элемента из дома. Добавление/удаление
         // элемента в DOM должно производиться вручную.
         hotelsContainer.removeChild(viewToRemove.el);
+        viewToRemove.off('galleryclick');
         viewToRemove.remove();
       }
     }
 
     hotelsCollection.slice(hotelsFrom, hotelsTo).forEach(function(model) {
       var view = new HotelView({ model: model });
+      // render только создает элемент в памяти, после этого его нужно
+      // добавить в документ вручную.
       view.render();
       fragment.appendChild(view.el);
+      renderedViews.push(view);
+
+      // В этом случае можно использовать анонимный обработчик событий,
+      // потому что Backbone умеет удалять все подписки на событие
+      // определенного типа, поэтому ссылку на обработчик хранить необязательно.
+      view.on('galleryclick', function() {
+        gallery.setPhotos(view.model.get('pictures'));
+        gallery.setCurrentPhoto(0);
+        gallery.show();
+      });
     });
 
     hotelsContainer.appendChild(fragment);
@@ -111,21 +110,57 @@
    * @return {Array.<Object>}
    */
   function filterHotels(filterID) {
+    var list = initiallyLoaded.slice(0);
+
     switch (filterID) {
       // При сортировке по возрастанию цены используется необычный алгоритм.
       // Он отправляет все отели, у которых цена равна нулю в конец списка,
       // оставляя при этом остальной список отсортированным от меньшей цены
       // к большей.
       case 'sort-by-price-asc':
-        hotelsCollection.sortBy('price');
+        list.sort(function(a, b) {
+          if (a.price > b.price || (b.price && a.price === 0)) {
+            return 1;
+          }
+
+          if (a.price < b.price || (a.price && b.price === 0)) {
+            return -1;
+          }
+
+          if (a.price === b.price) {
+            return 0;
+          }
+        });
         break;
+
       case 'sort-by-price-desc':
-        hotelsCollection.sortBy('price');
+        list.sort(function(a, b) {
+          return b.price - a.price;
+        });
         break;
-      default: break;
     }
 
+    hotelsCollection.reset(list);
     localStorage.setItem('filterID', filterID);
+  }
+
+  /**
+   * Проверяет есть ли у переданного элемента или одного из его родителей
+   * переданный CSS-класс.
+   * @param {Element} element
+   * @param {string} className
+   * @return {boolean}
+   */
+  function doesHaveParent(element, className) {
+    do {
+      if (element.classList.contains(className)) {
+        return true;
+      }
+
+      element = element.parentElement;
+    } while (element);
+
+    return false;
   }
 
   /**
@@ -139,6 +174,7 @@
     var filtersContainer = document.querySelector('.hotels-filters');
 
     filtersContainer.addEventListener('click', function(evt) {
+      evt.preventDefault();
       var clickedFilter = evt.target;
 
       if (doesHaveParent(clickedFilter, 'hotel-filter')) {
@@ -205,27 +241,13 @@
     });
   }
 
-  /**
-   * Добавляет обработчик события showgallery, которое испускается объектом window
-   * в объекте типа Hotel, если произошел клик по фотографии отеля. При наступлении
-   * этого события, показывает фотогалерею и загружает в нее фотографии отеля,
-   * полученные через метод getPhotos() у отеля, переданного через объект
-   * CustomEvent.prototype.detail.
-   */
-  function initGallery() {
-    window.addEventListener('showgallery', function(evt) {
-      gallery.setPhotos(evt.detail.hotelElement.getPhotos());
-      gallery.show();
-    });
-  }
-
-  hotelsCollection.fetch({ timeout: REQUEST_FAILURE_TIMEOUT }).success(function(/*loaded, state, jqXHR*/) {
+  hotelsCollection.fetch({ timeout: REQUEST_FAILURE_TIMEOUT }).success(function(loaded, state, jqXHR) {
+    initiallyLoaded = jqXHR.responseJSON;
     initFilters();
     initScroll();
-    initGallery();
 
-    setActiveFilter(localStorage.getItem('filterID') || 'sort-hotels-default');
-  }).fail(function(/*jqXHR, state, message*/) {
+    setActiveFilter(localStorage.getItem('filterID') || 'sort-by-default');
+  }).fail(function() {
     showLoadFailure();
   });
 })();

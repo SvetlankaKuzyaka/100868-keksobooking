@@ -80,7 +80,7 @@
 </div>
 
 <template id="hotel-template">
-  <article class="hotel">
+  <div>
     <span class="hotel-stars"></span>
     <h3 class="hotel-name"></h3>
     <div class="hotel-distance"><span class="hotel-distance-kilometers"></span> до центра</div>
@@ -92,14 +92,16 @@
       <li class="hotel-amenity hotel-amenity-parking">Парковка</li>
     </ul>
     <a href="#" class="hotel-price"><span class="hotel-price-value"></span>&nbsp;<span class="rouble">руб.</span></a>
-  </article>
+  </div>
 </template>
 
 <script src="lib/cookies.js"></script>
 <script src="js/form-validate.js"></script>
+<script src="js/models/hotel.js" charset="utf-8"></script>
 <script src="js/models/hotels.js" charset="utf-8"></script>
 <script src="js/views/hotel.js" charset="utf-8"></script>
 <script src="js/views/hotel-marker.js" charset="utf-8"></script>
+<script src="js/views/gallery-picture.js" charset="utf-8"></script>
 <script src="js/gallery.js" charset="utf-8"></script>
 <script src="js/hotels.js" charset="utf-8"></script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4O4PUGzJW-L6cz6_gGZpWwShDliv8QhI&callback=initMap"></script>

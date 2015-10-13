@@ -1,4 +1,4 @@
-/* global Backbone: true */
+/* global Backbone: true HotelModel: true */
 
 'use strict';
 
@@ -9,6 +9,7 @@
    * @param {Object} options
    */
   var HotelsCollection = Backbone.Collection.extend({
+    model: HotelModel,
     url: 'data/hotels-xhr.json'
   });
 

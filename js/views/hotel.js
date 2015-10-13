@@ -57,11 +57,34 @@
     initialize: function() {
       this._onImageLoad = this._onImageLoad.bind(this);
       this._onImageFail = this._onImageFail.bind(this);
+      this._onModelLike = this._onModelLike.bind(this);
+      this._onClick = this._onClick.bind(this);
+
+      this.model.on('change:liked', this._onModelLike);
     },
 
+    /**
+     * Маппинг событий происходящих на элементе на названия методов обработчиков
+     * событий.
+     * @type {Object.<string, string>}
+     */
     events: {
       'click': '_onClick'
     },
+
+    /**
+     * Тег, использующийся для элемента представления.
+     * @type {string}
+     * @override
+     */
+    tagName: 'article',
+
+    /**
+     * Класс элемента.
+     * @type {string}
+     * @override
+     */
+    className: 'hotel',
 
     /**
      * Отрисовка карточки отеля
@@ -70,7 +93,7 @@
     render: function() {
       // Клонирование нового объекта для отеля из шаблона и заполнение его реальными
       // данными, взятыми из свойства data_ созданного конструктором.
-      this.el = hotelTemplate.content.children[0].cloneNode(true);
+      this.el.appendChild(hotelTemplate.content.children[0].cloneNode(true));
       var amenitiesContainer = this.el.querySelector('.hotel-amenities');
 
       this.el.querySelector('.hotel-stars').classList.add(starsClassName[this.model.get('stars')]);
@@ -100,16 +123,33 @@
         hotelBackground.addEventListener('error', this._onImageFail);
         hotelBackground.addEventListener('abort', this._onImageFail);
       }
+
+      this._updateLike();
     },
 
     /**
+     * Обработчик кликов по элементу.
      * @param {MouseEvent} evt
      * @private
      */
     _onClick: function(evt) {
-      console.log('click happened', evt.target);
-      if (evt.target.className.contains('hotel')) {
+      var clickedElement = evt.target;
+
+      // Клик по фоновому элементу вызывает событие галереи, которая показывается
+      // если у отеля есть фотографии.
+      if (clickedElement.classList.contains('hotel') &&
+          !clickedElement.classList.contains('hotel-nophoto')) {
         this.trigger('galleryclick');
+      }
+
+      // Клик по иконке сердца, добавляет отель в избранное или удаляет его
+      // из избранного.
+      if (evt.target.classList.contains('hotel-favourite')) {
+        if (this.model.get('liked')) {
+          this.model.dislike();
+        } else {
+          this.model.like();
+        }
       }
     },
 
@@ -140,9 +180,26 @@
     },
 
     /**
+     * @private
+     */
+    _onModelLike: function() {
+      this._updateLike();
+    },
+
+    /**
+     * @private
+     */
+    _updateLike: function() {
+      var likeButton = this.el.querySelector('.hotel-favourite');
+
+      if (likeButton) {
+        likeButton.classList.toggle('hotel-favourite-liked', this.model.get('liked'));
+      }
+    },
+
+    /**
      * Удаление обработчиков событий на элементе.
      * @param {Image} image
-     * @return {Image}
      * @private
      */
     _cleanupImageListeners: function(image) {
