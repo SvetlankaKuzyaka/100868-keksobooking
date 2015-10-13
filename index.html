@@ -5,6 +5,7 @@
   <link rel="stylesheet" href="/css/main.css" media="screen" title="no title" charset="utf-8">
   <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
   <script type="text/javascript" src="http://underscorejs.org/underscore-min.js"></script>
+  <script type="text/javascript" src="http://backbonejs.org/backbone-min.js"></script>
   <title>Кексобукинг. Отели в Токио</title>
 </head>
 <body>
@@ -44,6 +45,7 @@
 </div>
 
 <div class="map map-hidden">
+  <div class="map-container"></div>
   <span class="map-switch"></span>
   <span class="map-close"></span>
 </div>
@@ -95,9 +97,12 @@
 
 <script src="lib/cookies.js"></script>
 <script src="js/form-validate.js"></script>
+<script src="js/models/hotels.js" charset="utf-8"></script>
+<script src="js/views/hotel.js" charset="utf-8"></script>
+<script src="js/views/hotel-marker.js" charset="utf-8"></script>
 <script src="js/gallery.js" charset="utf-8"></script>
-<script src="js/hotel.js" charset="utf-8"></script>
 <script src="js/hotels.js" charset="utf-8"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4O4PUGzJW-L6cz6_gGZpWwShDliv8QhI&callback=initMap"></script>
 
 </body>
 </html>

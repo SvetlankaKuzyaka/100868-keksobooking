@@ -180,7 +180,9 @@ body {
 }
 
 /* Map preview */
-.map {}
+.map {
+  position: relative;
+}
 
 .map-hidden {
   box-shadow: inset 0 8px 15px rgba(0, 26, 46, 0.36);
@@ -198,6 +200,12 @@ body {
   margin-left: -25px;
   position: absolute;
   width: 50px;
+}
+
+.map-container {
+  height: 100%;
+  position: absolute;
+  width: 100%;
 }
 
 /* Results list. */
