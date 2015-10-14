@@ -231,6 +231,7 @@
    */
   function initScroll() {
     var someTimeout;
+
     window.addEventListener('scroll', function() {
       clearTimeout(someTimeout);
       someTimeout = setTimeout(checkNextPage, 100);
@@ -241,10 +242,30 @@
     });
   }
 
+  /**
+   * Инициализация Google карты. Проверяет, подключилось ли API карт, если да,
+   * то создает представление карты, в противном случае ставит инициализацию
+   * в очередь обработки.
+   */
+  function initMap() {
+    function initializeMap() {
+      var myMap = new MapView({ collection: hotelsCollection });
+      myMap.setElement(document.querySelector('.map'));
+      myMap.render();
+    }
+
+    if (google && google.maps && google.maps.Map) {
+      initializeMap();
+    } else {
+      __mapsRegisteredCallbacks.push(initializeMap);
+    }
+  }
+
   hotelsCollection.fetch({ timeout: REQUEST_FAILURE_TIMEOUT }).success(function(loaded, state, jqXHR) {
     initiallyLoaded = jqXHR.responseJSON;
     initFilters();
     initScroll();
+    initMap();
 
     setActiveFilter(localStorage.getItem('filterID') || 'sort-by-default');
   }).fail(function() {
