@@ -1,12 +1,18 @@
+/* global google: true */
+
+'use strict';
+
 /**
  * @type {Array.<function>}
  */
 var __mapsRegisteredCallbacks = [];
 
+/* eslint-disable */
 /**
  * @param {function} callback
  */
 function initMap(callback) {
+/* eslint-enable */
   if (callback) {
     __mapsRegisteredCallbacks.push(callback);
     return;
@@ -51,7 +57,7 @@ function initMap(callback) {
       this._mapContainer = this.el.querySelector('.map-container');
 
       if (!this._mapContainer) {
-        throw new Exception('There is no container for Google Map. Probably setElement hasn\'t been ' +
+        throw new Error('There is no container for Google Map. Probably setElement hasn\'t been ' +
         'called on this element before render.');
       }
 
