@@ -1,4 +1,12 @@
-/* global Gallery: true HotelsCollection: true HotelView: true */
+/*
+  global
+    Gallery: true
+    google: true
+    HotelsCollection: true
+    HotelView: true
+    MapView: true
+    __mapsRegisteredCallbacks: true
+*/
 
 'use strict';
 

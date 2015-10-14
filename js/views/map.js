@@ -1,4 +1,4 @@
-/* global google: true */
+/* global google: true HotelMarkerView: true */
 
 'use strict';
 
