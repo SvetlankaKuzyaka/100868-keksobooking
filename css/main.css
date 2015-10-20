@@ -1,4 +1,5 @@
 html, body {
+  height: 100%;
   margin: 0;
   padding: 0;
 }
@@ -6,6 +7,7 @@ html, body {
 body {
   background: #fafaf4;
   font: 14px/1.3 Roboto, Arial, sans-serif;
+  height: auto;
   min-width: 980px;
 }
 
@@ -43,13 +45,16 @@ body {
 .header {
   background: rgba(0, 0, 0, 0.2);
   color: #fff;
+  height: 56px;
   margin-bottom: -56px;
+  overflow: hidden;
   position: relative;
+  z-index: 2;
 }
 
 .header-logo {
-  float: left;
-  margin-top: 6px;
+  position: absolute;
+  top: 6px;
 }
 
 .header-phone {
@@ -72,7 +77,12 @@ body {
 .welcome {
   background: #5d93a0 url('../img/welcome-overlay.jpg') no-repeat;
   background-size: auto 100%;
-  padding: 56px 0 75px;
+  box-shadow: 0 8px 15px rgba(0, 26, 46, 0.36);
+  box-sizing: border-box;
+  height: 508px;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 .welcome-title,
@@ -85,7 +95,7 @@ body {
 
 .welcome-title {
   font-size: 85px;
-  margin: 60px auto 0;
+  margin: 116px auto 0;
 }
 
 .welcome-stats {
@@ -98,7 +108,7 @@ body {
   background: rgba(242, 247, 248, 0.85);
   border-radius: 4px;
   box-sizing: border-box;
-  margin: 0 auto;
+  margin: 0 auto 75px;
   padding: 27px 20px 25px;
   width: 800px;
 }
@@ -181,13 +191,14 @@ body {
 
 /* Map preview */
 .map {
+  min-height: 68px;
+  transition: height 200ms ease-out;
+  height: 100%;
   position: relative;
 }
 
 .map-hidden {
-  box-shadow: inset 0 8px 15px rgba(0, 26, 46, 0.36);
-  height: 68px;
-  position: relative;
+  height: 0%;
 }
 
 .map-switch {
@@ -210,6 +221,7 @@ body {
 
 /* Results list. */
 .hotels {
+  overflow: hidden;
   padding-top: 25px;
 }
 
@@ -570,4 +582,35 @@ body {
 
 .gallery-overlay-control-right {
   background-position: -40px 0;
+}
+
+body.map-mode {
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Полноэкранный режим карты */
+.header,
+.welcome,
+.hotels {
+  transition: height 200ms ease-out;
+}
+
+.header {
+  transition: height 200ms ease-out, margin-bottom 200ms ease-out;
+}
+
+.map-mode .header,
+.map-mode .hotels {
+  height: 0;
+}
+
+.map-mode .welcome {
+  background-size: 100% auto;
+  height: 20px;
+}
+
+.map-mode .header {
+  margin-bottom: 0;
+  transition: margin-bottom 200ms ease-out;
 }

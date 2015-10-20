@@ -10,6 +10,34 @@
 
 'use strict';
 
+/**
+ * @type {Array.<function>}
+ */
+var __mapsRegisteredCallbacks = [];
+
+/**
+ * JSONP коллбэк, который вызывается после загрузки API карт. Разница в том,
+ * что по JSONP передаются не данные, а код, т.е. библиотека google.
+ * initMap представляет собой просто абстрактный обработчик очереди. Существует
+ * массив __mapsRegisteredCallbacks, который представляет собой очередь
+ * функций, которые надо выполнить после загрузки карт. В нашем случае первая
+ * функция — это инициализация класса MapView.
+ * @param {function} callback
+ */
+/* eslint-disable */
+/*
+ Отключение проверки на неиспользуемые переменные, поскольку
+ заведомо единственное использование этого метода — скриптом API карт Google
+ после их загрузки.
+ */
+function onMapLoad(callback) {
+/* eslint-enable */
+  var callbacksToExec = __mapsRegisteredCallbacks.slice(0);
+  while ((callback = callbacksToExec.shift())) {
+    callback();
+  }
+}
+
 (function() {
   /**
    * @const
@@ -238,11 +266,11 @@
    * и обработчик события loadneeded, который вызывает функцию отрисовки следующей страницы.
    */
   function initScroll() {
-    var someTimeout;
+    var scrollTimeout;
 
     window.addEventListener('scroll', function() {
-      clearTimeout(someTimeout);
-      someTimeout = setTimeout(checkNextPage, 100);
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(checkNextPage, 100);
     });
 
     window.addEventListener('hitthebottom', function() {
@@ -256,16 +284,28 @@
    * в очередь обработки.
    */
   function initMap() {
-    function initializeMap() {
+    /**
+     * Основная логика находится в этой функции. Функция нужна потому, что
+     * на момент выполнения initMap неясно — загрузилось ли API карт Google.
+     * Если да, то функция вызывается сразу и отрисовывает карту, в противном
+     * случае ставит эту функцию в очередь на исполнение после загрузки API.
+     * @return
+     */
+    function createAndRenderMap() {
       var myMap = new MapView({ collection: hotelsCollection });
       myMap.setElement(document.querySelector('.map'));
       myMap.render();
     }
 
-    if (google && google.maps && google.maps.Map) {
-      initializeMap();
+    // NB! Сложная проверка нужна потому что даже когда загрузка не закончена
+    // в объекте google может создаться неймспейс maps, в котором, однако,
+    // не будет нужных конструкторов. Поэтому существуют три ступени проверки:
+    // загружен ли скрипт google, успел ли он создать модуль maps и успел
+    // ли загрузить в него API карт.
+    if (typeof window['google'] !== 'undefined' && google.maps && google.maps.Map) {
+      createAndRenderMap();
     } else {
-      __mapsRegisteredCallbacks.push(initializeMap);
+      __mapsRegisteredCallbacks.push(createAndRenderMap);
     }
   }
 
