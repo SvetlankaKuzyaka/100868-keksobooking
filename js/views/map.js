@@ -40,6 +40,7 @@
       this._markers = [];
       this._collapsed = true;
       this._onClick = this._onClick.bind(this);
+      this._onHashChange = this._onHashChange.bind(this);
 
       // Загрузка списка достопримечательностей в модель POICollection. После
       // загрузки всех достопримечательностей, они добавляются в общий список
@@ -57,6 +58,8 @@
           this.drawMarkers();
         }
       }.bind(this));
+
+      window.addEventListener('hashchange', this._onHashChange);
     },
 
     /** @override */
@@ -90,6 +93,16 @@
       this.collection.forEach(function(item) {
         this._markers.push(new HotelMarkerView({ model: item }));
       }, this);
+
+      this.syncWithURL();
+    },
+
+    /**
+     * Вызывает схлопывание или развертывание карты, в зависимости от того,
+     * что записано в адресной строке.
+     */
+    syncWithURL: function() {
+      this.setCollapsed(!/^#map$/.test(location.hash));
     },
 
     /**
@@ -98,8 +111,20 @@
      */
     _onClick: function(evt) {
       if (evt.target.classList.contains('map-switch')) {
-        this.setCollapsed(!this._collapsed);
+        if (!this._collapsed) {
+          location.hash = '';
+        } else {
+          location.hash = 'map';
+        }
       }
+    },
+
+    /**
+     * Обработчик события изменения адресной строки.
+     * @private
+     */
+    _onHashChange: function() {
+      this.syncWithURL();
     },
 
     /**
