@@ -1,11 +1,8 @@
-/* global
-    GalleryPicture: true
-    define: true
-*/
-
 'use strict';
 
-define([], function() {
+define([
+  'views/gallery-picture'
+], function(GalleryPicture) {
   /**
    * Список констант кодов нажатых клавиш для обработки
    * клавиатурных событий.

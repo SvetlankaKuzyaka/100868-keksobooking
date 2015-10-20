@@ -1,5 +1,3 @@
-/* global define: true */
-
 'use strict';
 
 define(function() {

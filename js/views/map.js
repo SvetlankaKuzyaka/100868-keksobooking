@@ -1,6 +1,4 @@
-/* global
-    google: true
-    define: true  */
+/* global google: true  */
 
 'use strict';
 

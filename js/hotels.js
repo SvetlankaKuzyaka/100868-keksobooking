@@ -1,8 +1,6 @@
 /*
   global
-    define: true
     google: true
-    requirejs: true
     __mapsRegisteredCallbacks: true
 */
 
@@ -16,7 +14,11 @@ define([
   'gallery',
   'models/hotels',
   'views/hotel',
-  'views/map'
+  'views/map',
+  // NB! Модули, которые ничего не возвращают, а только исполняют код,
+  // тоже можно подключать, но главное делать это в конце списка, чтобы
+  // не объявлять им имя в параметрах.
+  'form-validate'
 ], function(Gallery, HotelsCollection, HotelView, MapView) {
   /**
    * @const

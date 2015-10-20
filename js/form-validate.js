@@ -1,6 +1,6 @@
 'use strict';
 
-(function() {
+define(function() {
   function addLeadingZero(value) {
     if (value < 10) {
       return '0' + value;
@@ -87,4 +87,4 @@
 
     formElement.submit();
   };
-})();
+});

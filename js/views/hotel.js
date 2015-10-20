@@ -1,5 +1,3 @@
-/* global Backbone: true define: true */
-
 'use strict';
 
 define(function() {
