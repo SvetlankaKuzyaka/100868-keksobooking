@@ -1,8 +1,11 @@
-/* global GalleryPicture: true */
+/* global
+    GalleryPicture: true
+    define: true
+*/
 
 'use strict';
 
-(function() {
+define([], function() {
   /**
    * Список констант кодов нажатых клавиш для обработки
    * клавиатурных событий.
@@ -177,6 +180,5 @@
     this._showCurrentPhoto();
   };
 
-  // Экспорт конструктора Gallery в глобальную область видимости.
-  window.Gallery = Gallery;
-})();
+  return Gallery;
+});

@@ -1,6 +1,8 @@
+/* global define: true */
+
 'use strict';
 
-(function() {
+define(function() {
   /**
    * @constructor
    * @extends {Backbone.Model}
@@ -20,5 +22,5 @@
     }
   });
 
-  window.HotelModel = HotelModel;
-})();
+  return HotelModel;
+});

@@ -1,8 +1,14 @@
-/* global google: true HotelMarkerView: true POICollection: true POIMarkerView: true */
+/* global
+    google: true
+    define: true  */
 
 'use strict';
 
-(function() {
+define([
+  'views/map-marker',
+  'views/poi-marker',
+  'models/poi'
+], function(HotelMarkerView, POIMarkerView, POICollection) {
   /**
    * Центр Токио для инициализации карты с правильными координатами.
    * @const
@@ -195,5 +201,5 @@
     }
   });
 
-  window.MapView = MapView;
-})();
+  return MapView;
+});

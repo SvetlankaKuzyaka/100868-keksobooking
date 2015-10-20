@@ -1,8 +1,12 @@
-/* global Backbone: true HotelModel: true */
+/* global
+    define: true
+*/
 
 'use strict';
 
-(function() {
+define([
+  'js/models/hotel.js'
+], function(HotelModel) {
   /**
    * @constructor
    * @param {Object} attributess
@@ -13,5 +17,5 @@
     url: 'data/hotels.json'
   });
 
-  window.HotelsCollection = HotelsCollection;
-})();
+  return HotelsCollection;
+});

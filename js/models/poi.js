@@ -1,6 +1,8 @@
+/* global define: true */
+
 'use strict';
 
-(function() {
+define(function() {
   /**
    * @constructor
    * @extends {Backbone.Collection}
@@ -9,5 +11,5 @@
     url: 'data/poi.json'
   });
 
-  window.POICollection = POICollection;
-})();
+  return POICollection;
+});

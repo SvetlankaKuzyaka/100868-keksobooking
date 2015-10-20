@@ -1,44 +1,23 @@
 /*
   global
-    Gallery: true
+    define: true
     google: true
-    HotelsCollection: true
-    HotelView: true
-    MapView: true
+    requirejs: true
     __mapsRegisteredCallbacks: true
 */
 
 'use strict';
 
-/**
- * @type {Array.<function>}
- */
-var __mapsRegisteredCallbacks = [];
+requirejs.config({
+  baseUrl: 'js'
+});
 
-/**
- * JSONP коллбэк, который вызывается после загрузки API карт. Разница в том,
- * что по JSONP передаются не данные, а код, т.е. библиотека google.
- * initMap представляет собой просто абстрактный обработчик очереди. Существует
- * массив __mapsRegisteredCallbacks, который представляет собой очередь
- * функций, которые надо выполнить после загрузки карт. В нашем случае первая
- * функция — это инициализация класса MapView.
- * @param {function} callback
- */
-/* eslint-disable */
-/*
- Отключение проверки на неиспользуемые переменные, поскольку
- заведомо единственное использование этого метода — скриптом API карт Google
- после их загрузки.
- */
-function onMapLoad(callback) {
-/* eslint-enable */
-  var callbacksToExec = __mapsRegisteredCallbacks.slice(0);
-  while ((callback = callbacksToExec.shift())) {
-    callback();
-  }
-}
-
-(function() {
+define([
+  'gallery',
+  'models/hotels',
+  'views/hotel',
+  'views/map'
+], function(Gallery, HotelsCollection, HotelView, MapView) {
   /**
    * @const
    * @type {number}
@@ -319,4 +298,4 @@ function onMapLoad(callback) {
   }).fail(function() {
     showLoadFailure();
   });
-})();
+});

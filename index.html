@@ -96,7 +96,7 @@
 </template>
 
 <script src="lib/cookies.js"></script>
-<script src="js/views/map-marker.js" charset="utf-8"></script>
+<!-- <script src="js/views/map-marker.js" charset="utf-8"></script>
 <script src="js/views/map.js"></script>
 <script src="js/form-validate.js"></script>
 <script src="js/models/hotel.js" charset="utf-8"></script>
@@ -105,7 +105,37 @@
 <script src="js/views/hotel.js" charset="utf-8"></script>
 <script src="js/views/gallery-picture.js" charset="utf-8"></script>
 <script src="js/gallery.js" charset="utf-8"></script>
-<script src="js/hotels.js" charset="utf-8"></script>
+<script src="js/hotels.js" charset="utf-8"></script> -->
+<script type="text/javascript">
+  /**
+   * @type {Array.<function>}
+   */
+  var __mapsRegisteredCallbacks = [];
+
+  /**
+   * JSONP коллбэк, который вызывается после загрузки API карт. Разница в том,
+   * что по JSONP передаются не данные, а код, т.е. библиотека google.
+   * initMap представляет собой просто абстрактный обработчик очереди. Существует
+   * массив __mapsRegisteredCallbacks, который представляет собой очередь
+   * функций, которые надо выполнить после загрузки карт. В нашем случае первая
+   * функция — это инициализация класса MapView.
+   * @param {function} callback
+   */
+  /* eslint-disable */
+  /*
+   Отключение проверки на неиспользуемые переменные, поскольку
+   заведомо единственное использование этого метода — скриптом API карт Google
+   после их загрузки.
+   */
+  function onMapLoad(callback) {
+  /* eslint-enable */
+    var callbacksToExec = __mapsRegisteredCallbacks.slice(0);
+    while ((callback = callbacksToExec.shift())) {
+      callback();
+    }
+  }
+</script>
+<script data-main="js/hotels.js" src="lib/require.min.js" charset="utf-8"></script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4O4PUGzJW-L6cz6_gGZpWwShDliv8QhI&callback=onMapLoad"></script>
 
 </body>
